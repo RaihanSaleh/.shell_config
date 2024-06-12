@@ -7,6 +7,10 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 # set path to homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
+# set path to pyenv
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init --path)"
+
 # set the default docker service
 export DEFAULT_DOCKER_SERVICE="$(basename $PWD)"
 
@@ -27,6 +31,20 @@ prompt_environment_confirmation() {
     fi
   fi
   return 0  # Signal to caller that it's okay to proceed
+}
+
+
+##########################################
+# AWS
+##########################################
+wap () {
+	if [ -z "$1" ]; then
+		export AWS_PROFILE=default
+    echo "AWS profile set to default"
+	else
+		export AWS_PROFILE="$1"
+    echo "AWS profile set to $1"
+	fi
 }
 
 
