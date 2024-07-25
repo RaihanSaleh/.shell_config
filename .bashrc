@@ -37,15 +37,19 @@ prompt_environment_confirmation() {
 ##########################################
 # AWS
 ##########################################
-wap () {
-	if [ -z "$1" ]; then
-		export AWS_PROFILE=default
-    echo "AWS profile set to default"
-	else
-		export AWS_PROFILE="$1"
-    echo "AWS profile set to $1"
-	fi
+saws () { export AWS_PROFILE="$@"; }
+uaws () { unset AWS_PROFILE; }
+taws () { \
+  clear; \
+  echo "AWS_PROFILE: ${AWS_PROFILE:-None}"; \
+  echo ""; \
+  aws configure list; \
+  echo ""; \
+  tail -30 ~/.aws/credentials; \
+  echo ""; \
+  tail -30 ~/.aws/config; \
 }
+sso () { saws topps; aws sso login --profile "${1:-$AWS_DEFAULT_PROFILE}"; }
 
 
 ##########################################
@@ -73,11 +77,25 @@ alias ....='../../../'
 # Common Directories
 ##########################################
 
-# make an alias for each project in the projects folder
-for dir in ~/projects/*/
+# lotus projects
+for dir in ~/projects/lotus/*/
 do
     dir=${dir%*/}
-    eval "alias ${dir##*/}='code ~/projects/${dir##*/}'"
+    eval "alias ${dir##*/}='code ~/projects/lotus/${dir##*/}'"
+done
+
+# fanatics projects
+for dir in ~/projects/fanatics/*/
+do
+    dir=${dir%*/}
+    eval "alias ${dir##*/}='code ~/projects/fanatics/${dir##*/}'"
+done
+
+# personal projects
+for dir in ~/projects/personal/*/
+do
+    dir=${dir%*/}
+    eval "alias ${dir##*/}='code ~/projects/personal/${dir##*/}'"
 done
 
 alias shell_config='code ~/.shell_config'
@@ -88,6 +106,7 @@ alias shell_config='code ~/.shell_config'
 alias dcub='docker-compose up --build'
 alias dcd='docker-compose down'
 alias dsp='docker system prune -af'
+alias dvp='docker volume prune -f'
 
 dcu () { \
   clear; \
@@ -246,14 +265,18 @@ pytr () { clear; coverage report; }
 ##########################################
 # Terraform
 ##########################################
-### set terraform variables for service db passwords
-export TF_VAR_listing_database_password=ALREADY_SET
-export TF_VAR_email_forwarder_database_password=ALREADY_SET
-export TF_VAR_show_database_password=ALREADY_SET
-export TF_VAR_speculation_database_password=ALREADY_SET
+alias tf='terraform'
+alias tfa='tf apply'
+alias tfaf='tfa -auto-approve'
 
-tga () { cd "$2"; terragrunt "$1"; cd ..; }
-alias tg="tga"
+tg_func () { cd ./infrastructure; cd "$2"; terragrunt "$1"; cd ../..; }
+alias tg="tg_func"
+
+tga_func () { cd ./infrastructure; cd "$1"; terragrunt apply; cd ../..; }
+alias tga="tga_func"
+
+tgaf_func () { cd ./infrastructure; cd "$1"; terragrunt apply -auto-approve; cd ../..; }
+alias tgaf="tgaf_func"
 
 
 ##########################################
