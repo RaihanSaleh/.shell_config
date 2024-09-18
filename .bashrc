@@ -11,6 +11,9 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 export PATH="$HOME/.pyenv/bin:$PATH"
 eval "$(pyenv init --path)"
 
+# set path to pycharm
+export PATH="/Applications/PyCharm.app/Contents/MacOS:$PATH"
+
 # set the default docker service
 export DEFAULT_DOCKER_SERVICE="$(basename $PWD)"
 
@@ -81,24 +84,24 @@ alias ....='../../../'
 for dir in ~/projects/lotus/*/
 do
     dir=${dir%*/}
-    eval "alias ${dir##*/}='code ~/projects/lotus/${dir##*/}'"
+    eval "alias ${dir##*/}='pycharm ~/projects/lotus/${dir##*/}'"
 done
 
 # fanatics projects
 for dir in ~/projects/fanatics/*/
 do
     dir=${dir%*/}
-    eval "alias ${dir##*/}='code ~/projects/fanatics/${dir##*/}'"
+    eval "alias ${dir##*/}='pycharm ~/projects/fanatics/${dir##*/}'"
 done
 
 # personal projects
 for dir in ~/projects/personal/*/
 do
     dir=${dir%*/}
-    eval "alias ${dir##*/}='code ~/projects/personal/${dir##*/}'"
+    eval "alias ${dir##*/}='pycharm ~/projects/personal/${dir##*/}'"
 done
 
-alias shell_config='code ~/.shell_config'
+alias shell_config='pycharm ~/.shell_config'
 
 ##########################################
 # Docker
@@ -207,8 +210,34 @@ alias ga='git add'
 alias gc='git commit -m'
 alias gca='git commit --amend -Chead'
 alias gco='git checkout'
+alias gp='git push'
 alias gl='git log --oneline -15'
-alias gt='git for-each-ref --sort=-creatordate --format "%(refname:strip=2)" refs/tags'
+alias gt='git for-each-ref --sort=-creatordate --format "%(refname:strip=2)" refs/tags | head -n 30'
+
+alias gacp='ga .; gc -; gp'
+
+function ngt() {
+    local tag_prefix
+    local last_tag
+    local new_version
+    local new_tag
+    
+    # Fetch the latest tag in the format v1.1.7-xyz-123 or v1.1.07-xyz-123
+    last_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+
+    if [[ $last_tag =~ ^(v[0-9]+\.[0-9]+\.[0-9]+)-.*$ ]]; then
+        tag_prefix=${match[1]}
+        # Extract the version number and increment it
+        new_version=$(echo $tag_prefix | awk -F. '{print $1 "." $2 "." $3+1}')
+        # Create the new tag with the provided string argument
+        new_tag="${new_version}-$1"
+        # Copy the new tag to the clipboard
+        echo -n $new_tag | pbcopy
+        echo "New tag: $new_tag copied to clipboard."
+    else
+        echo "No valid tag found."
+    fi
+}
 
 
 ##########################################
@@ -216,25 +245,20 @@ alias gt='git for-each-ref --sort=-creatordate --format "%(refname:strip=2)" ref
 ##########################################
 alias hf='git hf'
 
-alias hff='hf feature'
-alias hffs='hff start'
-alias hfff='hff finish'
-alias hffc='hff cancel'
+alias hffs='hf feature start'
+alias hffc='hf feature cancel'
+alias hfff='hf feature finish'
 
-alias hfh='hf hotfix'
-alias hfhs='hfh start'
-alias hfhf='hfh finish'
-alias hfhc='hfh cancel'
+alias hfhs='hf hotfix start'
+alias hfhc='hf hotfix cancel'
+alias hfhf='hf hotfix finish $(git rev-parse --abbrev-ref HEAD | sed "s/^hotfix\///")'
 
-alias hfr='hf release'
-alias hfrs='hfr start'
-alias hfrf='hfr finish'
-alias hfrc='hfr cancel'
+alias hfrs='hf release start'
+alias hfrc='hf release cancel'
+alias hfrf='hf release finish $(git rev-parse --abbrev-ref HEAD | sed "s/^release\///")'
 
 alias hfu='hf update'
 alias hfp='hf push'
-
-alias cowboy='ga .; gc -; hfp'
 
 
 ##########################################
