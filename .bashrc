@@ -106,14 +106,14 @@ alias shell_config='pycharm ~/.shell_config'
 ##########################################
 # Docker
 ##########################################
-alias dcub='docker-compose up --build'
+alias dcub='docker-compose up --build --remove-orphans'
 alias dcd='docker-compose down'
 alias dsp='docker system prune -af'
 alias dvp='docker volume prune -f'
 
 dcu () { \
   clear; \
-  docker-compose up "${1:-$DEFAULT_DOCKER_SERVICE}" \
+  docker-compose up "${1:-$DEFAULT_DOCKER_SERVICE}" --remove-orphans \
 }
 
 dca () { \
@@ -129,12 +129,13 @@ dcssh () { \
 }
 
 dcx () { \
+  prompt_environment_confirmation || return 1
   clear; \
   docker compose run --rm --no-deps "${1:-$DEFAULT_DOCKER_SERVICE}" \
   python x.py; \
 }
 
-dct () { \
+dcdt () { \
   unset ENVIRONMENT; \
   clear; \
   docker compose run --rm --no-deps "${1:-$DEFAULT_DOCKER_SERVICE}" \
@@ -148,20 +149,22 @@ dcpt () { \
   pytest --disable-pytest-warnings -k "${1:-.}" -vv; \
 }
 
-dcmigrate () { \
+dcdm () { \
   unset ENVIRONMENT; \
   clear; \
   docker compose run --rm --no-deps "${1:-$DEFAULT_DOCKER_SERVICE}" \
   python manage.py migrate;
 }
 
-dcmm () { \
+dcdmm () { \
+  unset ENVIRONMENT; \
   clear; \
   docker compose run --rm --no-deps "${1:-$DEFAULT_DOCKER_SERVICE}" \
   python manage.py makemigrations;
 }
 
-dcmigratezero () { \
+dcdm-zero () { \
+  unset ENVIRONMENT; \
   clear; \
   docker compose run --rm --no-deps "${1:-$DEFAULT_DOCKER_SERVICE}" \
   python manage.py migrate core zero;
@@ -214,7 +217,7 @@ alias gp='git push'
 alias gl='git log --oneline -15'
 alias gt='git for-each-ref --sort=-creatordate --format "%(refname:strip=2)" refs/tags | head -n 30'
 
-alias gacp='ga .; gc -; gp'
+alias gacp='ga .; gc cowboy; gp'
 
 function ngt() {
     local tag_prefix
