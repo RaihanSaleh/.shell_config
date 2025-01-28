@@ -106,14 +106,14 @@ alias shell_config='pycharm ~/.shell_config'
 ##########################################
 # Docker
 ##########################################
-alias dcub='docker-compose up --build --remove-orphans'
-alias dcd='docker-compose down'
+alias dcub='docker compose up --build --remove-orphans'
+alias dcd='docker compose down'
 alias dsp='docker system prune -af'
 alias dvp='docker volume prune -f'
 
 dcu () { \
   clear; \
-  docker-compose up "${1:-$DEFAULT_DOCKER_SERVICE}" --remove-orphans \
+  docker compose up "${1:-$DEFAULT_DOCKER_SERVICE}" --remove-orphans \
 }
 
 dca () { \
