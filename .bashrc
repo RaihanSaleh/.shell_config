@@ -217,7 +217,8 @@ alias gp='git push'
 alias gl='git log --oneline -15'
 alias gt='git for-each-ref --sort=-creatordate --format "%(refname:strip=2)" refs/tags | head -n 30'
 
-alias gacp='ga .; gc cowboy; gp'
+alias gacp='ga .; gc -; gp'
+alias cowboy='ga .; gc cowboy; gp'
 
 function ngt() {
     local tag_prefix
